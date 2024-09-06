@@ -10,14 +10,17 @@ trait ICounter<TContractState> {
 mod Counter {
     use starknet::{ContractAddress};
     use super::ICounter;
+    use kill_switch::{IKillSwitchDispatcher, IKillSwitchDispatcherTrait};
 
     #[storage]
     struct Storage {
         counter: u32,
+        kill_switch: IKillSwitchDispatcher,
     }
     #[constructor]
-    fn constructor(ref self: ContractState, init_counter: u32) {
+    fn constructor(ref self: ContractState, init_counter: u32, kill_switch_address: ContractAddress) {
         self.counter.write(init_counter);
+        self.kill_switch.write(IKillSwitchDispatcher { contract_address: kill_switch_address });
     }
     #[abi(embed_v0)]
     impl CounterImpl of ICounter<ContractState> {
